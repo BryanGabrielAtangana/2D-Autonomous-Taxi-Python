@@ -101,12 +101,11 @@ grid_obstacles = [
     ]
 ]
 
-
 # Initialize the passengers
 passengers = generate_passengers(taxi_stops)
 
 # Initialize the taxi with a capacity of 3 passengers
-taxi = Taxi(taxi_id=1, start_point=Point(5, 5), color=TAXI_COLOR, capacity=3)
+taxi = Taxi(taxi_id=1, start_point=Point(5, 5), color=TAXI_COLOR, capacity=4)
 
 def draw_grid(surface):
     for x in range(0, SCREEN_WIDTH, GRID_SIZE):
@@ -130,7 +129,8 @@ while running:
 
     # Taxi needs charging
     if taxi.battery_life <= 20 and not taxi.is_charging:
-        charging_station = taxi.navigate_to_charging_station(charging_stations)
+        obstacles = [obs.position for obs in grid_obstacles]
+        charging_station = taxi.navigate_to_charging_station(charging_stations, obstacles)
         if taxi.position == charging_station.position:
             taxi.is_charging = True  # Begin charging
 
