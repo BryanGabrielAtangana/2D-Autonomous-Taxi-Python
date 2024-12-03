@@ -4,13 +4,21 @@
 
 Download python : https://www.python.org/downloads/
 
-clone repository
-```git clone https://github.com/BryanGabrielAtangana/2D-Autonomous-Taxi-Python.git```
-```cd 2D-Autonomous-Taxi-Python```
+Clone repository
+
+```
+git clone https://github.com/BryanGabrielAtangana/2D-Autonomous-Taxi-Python.git
+cd 2D-Autonomous-Taxi-Python
+```
 
 Install pygame
 
 Windows :
-```pip install pygame```
+```
+pip install pygame
+```
+
 MacOS :
-```pip3 install pygame``
+```
+pip3 install pygame
+```
