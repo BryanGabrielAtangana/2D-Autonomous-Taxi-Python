@@ -6,6 +6,8 @@ WHITE = (255, 255, 255)
 GRID_SIZE = 20
 
 pygame.init()
+
+# police 
 font = pygame.font.Font('arial.ttf', 25)
 
 class ChargingStation:
@@ -14,13 +16,13 @@ class ChargingStation:
         self.position = position
 
     def draw(self, surface):
-        # Draw a larger rectangle for charging station
+        # Station de recharge, rectangle avec un C
         pygame.draw.rect(
             surface,
             CHARGING_STATION_COLOR,
             (self.position.x * GRID_SIZE, self.position.y * GRID_SIZE, GRID_SIZE * 2, GRID_SIZE * 2)
         )
-        # Electric insignia
+
         text = font.render("C", True, WHITE)
         text_rect = text.get_rect(center=(
             self.position.x * GRID_SIZE + GRID_SIZE,
