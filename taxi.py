@@ -33,7 +33,8 @@ class Taxi:
             self.color, 
             (self.position.x * GRID_SIZE, self.position.y * GRID_SIZE, GRID_SIZE, GRID_SIZE)
         )
-        # Passenger count display
+
+        # Affichage du nombre de passager
         passenger_text = font.render(str(len(self.passengers)), True, (200,200,200))
         passenger_rect = passenger_text.get_rect(center=(
             self.position.x * GRID_SIZE + GRID_SIZE // 2,
@@ -41,7 +42,7 @@ class Taxi:
         ))
         surface.blit(passenger_text, passenger_rect)
 
-        # Battery display
+        # Affichage de la batterie
         battery_color = (0, 255, 0) if self.battery_life > 50 else (255, 165, 0) if self.battery_life > 20 else (255, 0, 0)
         battery_width = int((self.battery_life / 100) * GRID_SIZE)
         pygame.draw.rect(
@@ -50,6 +51,7 @@ class Taxi:
             (self.position.x * GRID_SIZE, self.position.y * GRID_SIZE + GRID_SIZE, battery_width, 5)
         )
 
+    # Algorithme A* pour trouver le chemin
     def a_star_pathfinding(self, target, obstacles):
         def heuristic(a, b):
             return abs(a.x - b.x) + abs(a.y - b.y)
@@ -61,7 +63,7 @@ class Taxi:
                 Point(point.x + 1, point.y + 1), Point(point.x - 1, point.y - 1),
                 Point(point.x + 1, point.y - 1), Point(point.x - 1, point.y + 1)
             ]
-            # Exclude obstacles and out-of-bounds points
+            # Exclue les points qui ne sont pas dans la grille
             return [
                 n for n in neighbors 
                 if (0 <= n.x < GRID_WIDTH and 0 <= n.y < GRID_HEIGHT) and 
@@ -94,32 +96,31 @@ class Taxi:
                     f_score[neighbor] = g_score[neighbor] + heuristic(neighbor, target)
                     heapq.heappush(open_set, (f_score[neighbor], neighbor))
 
-        return []  # No path found
+        return []  # Reste statique si aucun chemin n'est trouvé
 
     
-    def navigate_to_charging_station(self, charging_stations, obstales):
-        # Find the nearest charging station
+    def navigate_to_charging_station(self, charging_stations, obstacles):
+        # Trouve la station la plus proche
         nearest_station = min(
             charging_stations,
             key=lambda station: abs(station.position.x - self.position.x) + abs(station.position.y - self.position.y)
         )
-        obstacles = []  # Add obstacles if necessary
         self.path = self.a_star_pathfinding(nearest_station.position, obstacles)
         return nearest_station
 
     def move_along_path(self):
         if self.battery_life <= 0:
             print(f"Taxi {self.taxi_id} has stopped due to battery depletion.")
-            return  # Stop moving when the battery is depleted
+            return 
         
         if self.is_charging:
             self.charge_time += 1
-            if self.charge_time >= 5:  # Simulate charging over 5 cycles
+            if self.charge_time >= 5:
                 self.battery_life = 100
                 self.is_charging = False
                 self.charge_time = 0
             return
         elif self.path:
             self.position = self.path.pop(0)
-            self.battery_life -= 0.25  # Reduce battery life per move
+            self.battery_life -= 0.25
 
