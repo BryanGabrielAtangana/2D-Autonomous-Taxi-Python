@@ -1,3 +1,5 @@
+"""taxi.py"""
+
 import pygame
 import heapq
 from collections import namedtuple
