@@ -95,7 +95,7 @@ class Taxi:
         return []  # No path found
 
     
-    def navigate_to_charging_station(self, charging_stations):
+    def navigate_to_charging_station(self, charging_stations, obstales):
         # Find the nearest charging station
         nearest_station = min(
             charging_stations,
