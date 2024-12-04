@@ -1,0 +1,50 @@
+@startuml autonomous_taxi
+class TaxiStop {
+    draw()
+        stop_id
+    position
+    color
+    __init__()
+}
+class ChargingStation {
+    draw()
+        station_id
+    position
+    __init__()
+}
+class Obstacle {
+    draw()
+        obstacle_id
+    position
+    __init__()
+}
+class Passenger {
+    draw()
+        passenger_id
+    position
+    destination
+    color
+    __init__()
+}
+class Taxi {
+    draw()
+    a_star_pathfinding()
+    heuristic()
+    get_neighbors()
+    navigate_to_charging_station()
+    move_along_path()
+        taxi_id
+    position
+    color
+    capacity
+    battery_life
+    is_charging
+    charge_time
+    path
+    battery_life
+    is_charging
+    charge_time
+    position
+    __init__()
+}
+@enduml
