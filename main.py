@@ -8,6 +8,7 @@ from passenger import Passenger
 from taxi_stop import TaxiStop
 from charging_station import ChargingStation
 from obstacle import Obstacle
+from performance_metrics import PerformanceTracker
 
 pygame.init()
 
@@ -30,6 +31,21 @@ pygame.display.set_caption("Simulation Agent autonome - IA 2024")
 
 # Police
 font = pygame.font.SysFont(None, 24)
+metrics_font = pygame.font.SysFont(None, 20)
+
+def draw_performance_metrics(surface, performance_tracker):
+    metrics = performance_tracker.calculate_metrics()
+    metric_texts = [
+        f"Completion Rate: {metrics['completion_rate']:.2f}%",
+        f"Idle Time: {metrics['idle_percentage']:.2f}%",
+        f"Avg Ride Duration: {metrics['avg_ride_duration']:.2f} sec",
+    ]
+
+    y_offset = SCREEN_HEIGHT - 590
+    for text in metric_texts:
+        metric_surface = metrics_font.render(text, True, (0, 0, 0))
+        surface.blit(metric_surface, (10, y_offset))
+        y_offset += 20
 
 # Genère les passager
 def generate_passengers(taxi_stops):
@@ -101,8 +117,8 @@ grid_obstacles = [
     # Block 7
     *[
         Obstacle(obstacle_id=31 + i * 5 + j, position=Point(60 + i, 20 + j))
-        for i in range(3)  # Rows
-        for j in range(3)  # Columns
+        for i in range(3)
+        for j in range(3)  
     ]
 ]
 
@@ -111,6 +127,9 @@ passengers = generate_passengers(taxi_stops)
 
 # Intialisation de l'agent
 taxi = Taxi(taxi_id=1, start_point=Point(5, 5), color=TAXI_COLOR, capacity=3)
+
+# Initialisation du tracker de performance
+performance_tracker = PerformanceTracker(len(passengers))
 
 # Dessine la grille
 def draw_grid(surface):
@@ -133,8 +152,11 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+    performance_tracker.operational_time += 1
+
     # Logic de recharge lorsque le taxi est décharger
     if taxi.battery_life <= 20 and not taxi.is_charging:
+        performance_tracker.idle_time += 1
         obstacles = [obs.position for obs in grid_obstacles]
         charging_station = taxi.navigate_to_charging_station(charging_stations, obstacles)
         if taxi.position == charging_station.position:
@@ -157,6 +179,9 @@ while running:
                 if taxi.position == destination.position:
                     destination.dropped_passengers.append(passenger)
                     taxi.passengers.remove(passenger)
+                    performance_tracker.end_ride()
+                    performance_tracker.completed_rides += 1
+
 
         # Prend le passager si il y a de l'espace
         if len(taxi.passengers) < taxi.capacity and passengers:
@@ -172,13 +197,19 @@ while running:
                 if taxi.position == passenger.position:
                     taxi.passengers.append(passenger)
                     passengers.remove(passenger)
+                    performance_tracker.start_ride()
 
         #Regénère de nouveaux passager à la fin de chaque cycle
         if not passengers and not taxi.passengers:
             passengers = generate_passengers(taxi_stops)
+            performance_tracker.total_ride_requests += len(passengers)
 
     # movement du taxi
     taxi.move_along_path()
+    performance_tracker.total_distance += 1 if taxi.path else 0
+
+    if taxi.is_charging:
+        performance_tracker.charging_time += 1
 
     screen.fill(WHITE)
 
@@ -192,6 +223,8 @@ while running:
     for obstacle in grid_obstacles:
         obstacle.draw(screen)
     taxi.draw(screen)
+
+    draw_performance_metrics(screen, performance_tracker)
 
     # Actualise la fenêtre d'affichage
     pygame.display.flip()
